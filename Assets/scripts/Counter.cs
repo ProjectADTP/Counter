@@ -1,15 +1,20 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CounterCoroutine : MonoBehaviour, IPointerDownHandler
+public class Counter : MonoBehaviour, IPointerDownHandler
 {
-    [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private CounterView _counterView;
 
-    private float _counterValue = 0f;
+    private float _counterValue;
     private float _duration = 0.5f;
     private Coroutine _counterCoroutine;
+    private WaitForSeconds _wait;
+
+    private void Awake()
+    {
+        _wait = new WaitForSeconds(_duration);
+    }
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -25,19 +30,18 @@ public class CounterCoroutine : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    private void Start()
-    {
-        _text.text = _counterValue.ToString();
-    }
-
     private IEnumerator IncreaseCounterValue()
     {
-        while (true)
-        {
-            _counterValue++;
-            _text.text = _counterValue.ToString();
+        float elapsedTime = 0f;
 
-            yield return new WaitForSeconds(_duration);
+        while (elapsedTime < _duration)
+        {
+            elapsedTime += Time.deltaTime / 2;
+
+            _counterValue++;
+            _counterView.ChangeCounterValue(_counterValue);
+
+            yield return _wait; 
         }
     }
 }
